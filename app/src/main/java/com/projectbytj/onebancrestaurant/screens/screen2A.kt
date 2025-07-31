@@ -14,6 +14,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.ui.draw.rotate
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -55,113 +58,142 @@ fun DishesScreen(
     var selectedFilter by remember { mutableStateOf("Filter by Price") }
     val rotation by animateFloatAsState(if (expanded) 180f else 0f)
 
-    Column {
-        // --- Cuisine Title ---
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = cuisineName,
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
-                color = Color.Black
-            )
-            Text(
-                text = "Choose your favorite dishes",
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
-        }
+    Box(modifier = Modifier.fillMaxSize()) {
 
-        // --- Modern Dropdown ---
-        Box(Modifier.padding(horizontal = 16.dp)) {
-            Card(
+        Column(modifier = Modifier.fillMaxSize()) {
+            // --- Top Row with Back Button & Title ---
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { expanded = true },
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(4.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
+                Button(
+                    onClick = { navController.popBackStack() },
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                ) {
+                    Text("<", color = Color.White)
+                }
+
+                Text(
+                    text = cuisineName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.width(40.dp)) // For symmetry
+            }
+
+            // --- Dropdown Filter ---
+            Box(Modifier.padding(horizontal = 12.dp)) {
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 12.dp, horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .clickable { expanded = true },
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
                 ) {
-                    Text(selectedFilter, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = null,
-                        modifier = Modifier.rotate(rotation)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp, horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(selectedFilter, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier.rotate(rotation)
+                        )
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .background(Color.White, RoundedCornerShape(12.dp))
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("≤ 50") },
+                        onClick = {
+                            selectedFilter = "Filter by Price: ≤ 50"
+                            expanded = false
+                            viewModel.applyPriceFilter(50, dishes)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("≤ 100") },
+                        onClick = {
+                            selectedFilter = "Filter by Price: ≤ 100"
+                            expanded = false
+                            viewModel.applyPriceFilter(100, dishes)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("≤ 200") },
+                        onClick = {
+                            selectedFilter = "Filter by Price: ≤ 200"
+                            expanded = false
+                            viewModel.applyPriceFilter(200, dishes)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Clear Filter") },
+                        onClick = {
+                            selectedFilter = "Filter by Price"
+                            expanded = false
+                            viewModel.clearFilter()
+                        }
                     )
                 }
             }
 
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .background(Color.White, RoundedCornerShape(12.dp))
-            ) {
-                DropdownMenuItem(
-                    text = { Text("≤ 50") },
-                    onClick = {
-                        selectedFilter = "Filter by Price: ≤ 50"
-                        expanded = false
-                        viewModel.applyPriceFilter(50, dishes)
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("≤ 100") },
-                    onClick = {
-                        selectedFilter = "Filter by Price: ≤ 100"
-                        expanded = false
-                        viewModel.applyPriceFilter(100, dishes)
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("≤ 200") },
-                    onClick = {
-                        selectedFilter = "Filter by Price: ≤ 200"
-                        expanded = false
-                        viewModel.applyPriceFilter(200, dishes)
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Clear Filter") },
-                    onClick = {
-                        selectedFilter = "Filter by Price"
-                        expanded = false
-                        viewModel.clearFilter()
-                    }
-                )
-            }
-        }
+            Spacer(Modifier.height(12.dp))
 
-        Spacer(Modifier.height(12.dp))
-
-        if (displayDishes.isEmpty()) {
-            Text(
-                "No dishes available for $cuisineName",
-                Modifier.padding(16.dp),
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-        } else {
-            LazyColumn {
-                items(displayDishes) { dish ->
-                    DishCard(dish, navController)
+            if (displayDishes.isEmpty()) {
+                Text(
+                    "No dishes available for $cuisineName",
+                    Modifier.padding(16.dp),
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            } else {
+                LazyColumn(contentPadding = PaddingValues(bottom = 80.dp)) {
+                    items(displayDishes) { dish ->
+                        DishCard(dish, navController ,cuisineName )
+                    }
                 }
             }
         }
+
+        // --- Fixed Checkout Button ---
+        Button(
+            onClick = { navController.navigate("cart") },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(16.dp)
+                .height(55.dp),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+        ) {
+            Text(
+                "Proceed to Checkout",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
+
 @Composable
-fun DishCard(dish: Dish, navController: NavController) {
+fun DishCard(dish: Dish, navController: NavController , cuisineName: String) {
     // Initialize quantity from Cart if already added
     var quantity by remember { mutableStateOf(Cart.find { it.id == dish.id }?.quantity?.value ?: 0) }
 
@@ -172,11 +204,12 @@ fun DishCard(dish: Dish, navController: NavController) {
             if (existingItem != null) {
                 existingItem.quantity.value = quantity
             } else {
+
                 Cart.add(
                     CartItem(
                         id = dish.id.toString(),
                         name = dish.name,
-                        cuisineName = "", // pass cuisine if available
+                        cuisineName = cuisineName,
                         imageUrl = dish.image_url,
                         price = dish.price.toInt(),
                         quantity = mutableStateOf(quantity)

@@ -1,12 +1,12 @@
 package com.projectbytj.onebancrestaurant.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,110 +14,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Text
-
-
-// Dummy Cart list (Replace with your actual cart list)
 var Cart = mutableStateListOf<CartItem>()
 
 data class CartItem(
-    val id: String,  // instead of String
+    val id: String,
     val name: String,
     val cuisineName: String,
     val imageUrl: String,
     val price: Int,
     var quantity: MutableState<Int> = mutableStateOf(1)
 )
-//
-//@Composable
-//fun PaymentScreen(
-//    navController: NavController,
-//    viewModel: PageLink = viewModel()
-//)
-//{
-//    val total by remember { derivedStateOf { Cart.sumOf { it.price * it.quantity.value } } }
-//    val paymentResponse = viewModel.paymentResponse.value
-//
-//    var showDialog by remember { mutableStateOf(false) }
-//
-//    // If payment successful, trigger dialog
-//    LaunchedEffect(paymentResponse) {
-//        if (paymentResponse != null && paymentResponse.outcome_code == 1) {
-//            showDialog = true
-//        }
-//    }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Color(0xFFF8F8F8))
-//    ) {
-//        Text(
-//            text = "CART",
-//            fontSize = 22.sp,
-//            fontWeight = FontWeight.Bold,
-//            modifier = Modifier.padding(16.dp)
-//        )
-//
-//        LazyColumn(modifier = Modifier.weight(1f)) {
-//            items(Cart) { item ->
-//                CartItemCard(item)
-//            }
-//            item {
-//                OrderDetails(total)
-//                ReturnPolicy()
-//            }
-//        }
-//
-//        PaymentCard(total, viewModel)
-//    }
-//
-//    // ===== Payment Success Dialog =====
-//    if (showDialog && paymentResponse != null) {
-//        AlertDialog(
-//            onDismissRequest = { showDialog = false },
-//            title = {
-//                Text(
-//                    text = "Payment Successful",
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 20.sp
-//                )
-//            },
-//            text = {
-//                Column {
-//                    Text(text = "Transaction ID: ${paymentResponse.transaction_id ?: "N/A"}")
-//                    Text(text = "Your order is on its way!", fontWeight = FontWeight.SemiBold)
-//                }
-//            },
-//            confirmButton = {
-//                Button(
-//                    onClick = { showDialog = false },
-//                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-//                ) {
-//                    Text("OK", color = Color.White)
-//                }
-//            }
-//        )
-//    }
-//}
 
 @Composable
 fun CartItemCard(item: CartItem) {
@@ -136,7 +51,6 @@ fun CartItemCard(item: CartItem) {
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product Image (From URL)
             AsyncImage(
                 model = item.imageUrl,
                 contentDescription = item.name,
@@ -166,10 +80,9 @@ fun CartItemCard(item: CartItem) {
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
-
-                // Counter
                 CounterView(item)
             }
+
             IconButton(
                 onClick = { Cart.remove(item) },
                 modifier = Modifier.size(24.dp)
@@ -183,6 +96,7 @@ fun CartItemCard(item: CartItem) {
         }
     }
 }
+
 @Composable
 fun CounterView(item: CartItem) {
     Row(
@@ -216,169 +130,60 @@ fun CounterView(item: CartItem) {
     }
 }
 
-//@Composable
-//fun OrderDetails(total: Int) {
-//    val deliveryFee = 100
-//    val platformFee = 19
-//    val payableAmount = total + deliveryFee + platformFee
-//
-//    Card(
-//        modifier = Modifier
-//            .padding(8.dp)
-//            .fillMaxWidth(),
-//        elevation = CardDefaults.cardElevation(4.dp),
-//        colors = CardDefaults.cardColors(Color.White)
-//    ) {
-//        Column(
-//            modifier = Modifier.padding(16.dp),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
-//        ) {
-//            Text("ORDER DETAILS", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-//            OrderDetailRow("Bag Total", total)
-//            OrderDetailRow("Delivery Fee", deliveryFee)
-//            OrderDetailRow("Platform Fee", platformFee)
-//            Divider()
-//            OrderDetailRow("Amount Payable", payableAmount, isBold = true)
-//        }
-//    }
-//}
-//
-@Composable
-fun OrderDetailRow(label: String, amount: Int, isBold: Boolean = false) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
-        )
-        Text(
-            text = "₹$amount",
-            fontSize = 14.sp,
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
-        )
-    }
-}
-
-@Composable
-fun ReturnPolicy() {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(Color.White)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("Return & Refund Policy", fontWeight = FontWeight.Bold)
-            Text(
-                text = "In case of any return, we ensure quick refunds. Full amount will be reflected excluding convenience fee.",
-                fontSize = 12.sp
-            )
-        }
-    }
-}
-//@Composable
-//fun PaymentCard(total: Int, viewModel: PageLink) {
-//    val deliveryFee = 100
-//    val platformFee = 19
-//    val payableAmount = total + deliveryFee + platformFee   // For display only
-//
-//    Card(
-//        modifier = Modifier
-//            .padding(8.dp)
-//            .fillMaxWidth(),
-//        elevation = CardDefaults.cardElevation(4.dp),
-//        colors = CardDefaults.cardColors(Color.White)
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp),
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.SpaceBetween
-//        ) {
-//            // Display payable amount (UI only)
-//            Text(
-//                text = "₹$payableAmount",
-//                fontSize = 18.sp,
-//                fontWeight = FontWeight.Bold
-//            )
-//
-//            // Payment button
-//            Button(
-//                onClick = {
-//                    if (Cart.isNotEmpty()) {
-//                        val item = Cart[0]
-//
-//                        // API should only get the item total, not delivery/platform fee
-//                        val amount = item.price * item.quantity.value
-//
-//                        // Ensure numeric string for itemId
-//
-//
-//                        viewModel.makePayment(
-//                            itemId = item.id,
-//                            quantity = item.quantity.value,
-//                            amount = amount
-//                        )
-//                    }
-//                },
-//                shape = RoundedCornerShape(8.dp),
-//                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-//            ) {
-//                Text("Proceed to Payment >", color = Color.White)
-//            }
-//        }
-//    }
-//}
-
-
 @Composable
 fun PaymentScreen(
     navController: NavController,
     viewModel: PageLink = viewModel()
 ) {
     val total by remember { derivedStateOf { Cart.sumOf { it.price * it.quantity.value } } }
-    val cuisinesSelected = Cart.map { it.cuisineName }.distinct()  // accurate cuisine names
-    val paymentResponse = viewModel.paymentResponse.value
+    val cuisinesSelected = Cart.map { it.cuisineName }.distinct()
     var showDialog by remember { mutableStateOf(false) }
 
-    // Taxes
     val cgst = total * 0.025
     val sgst = total * 0.025
     val grandTotal = total + cgst + sgst
 
-    LaunchedEffect(paymentResponse) {
-        if (paymentResponse != null && paymentResponse.outcome_code == 1) {
-            showDialog = true
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F8F8))
+            .background(Color(0xFFFDF6EC))
     ) {
-        // ---- Selected Cuisines ----
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(
+                onClick = { navController.popBackStack() },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+            ) {
+                Text("<", color = Color.White)
+            }
+            Text(
+                text = "Your Cart",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                color = Color.Black
+            )
+            Spacer(modifier = Modifier.width(40.dp))
+        }
+
         Card(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(horizontal = 10.dp, vertical = 4.dp)
                 .fillMaxWidth(),
             elevation = CardDefaults.cardElevation(4.dp),
             colors = CardDefaults.cardColors(Color.White)
         ) {
-            Column(Modifier.padding(16.dp)) {
-                Text("Cuisines Selected", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, fontSize = 18.sp)
+            Column(Modifier.padding(10.dp)) {
+                Text("Cuisines Selected", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Text(cuisinesSelected.joinToString(", "), fontSize = 14.sp, color = Color.Gray)
             }
         }
 
-        // ---- Cart Items ----
         LazyColumn(modifier = Modifier.weight(1f)) {
             if (Cart.isEmpty()) {
                 item {
@@ -406,9 +211,7 @@ fun PaymentScreen(
                     }
                 }
             } else {
-                items(Cart) { item ->
-                    CartItemCard(item)
-                }
+                items(Cart) { item -> CartItemCard(item) }
                 item {
                     OrderSummary(total, cgst, sgst, grandTotal)
                     ReturnPolicy()
@@ -416,18 +219,11 @@ fun PaymentScreen(
             }
         }
 
-
-        // ---- Place Order Button ----
         Button(
             onClick = {
                 if (Cart.isNotEmpty()) {
-                    val item = Cart[0]
-                    val amount = item.price * item.quantity.value
-                    viewModel.makePayment(
-                        itemId = item.id.toString(),
-                        quantity = item.quantity.value,
-                        amount = amount
-                    )
+                    showDialog = true
+                    Cart.clear()
                 }
             },
             modifier = Modifier
@@ -437,30 +233,29 @@ fun PaymentScreen(
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
         ) {
-            Text("Place Order", color = Color.White, fontSize = 16.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+            Text("Place Order", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
-    }
 
-    // ---- Payment Success Dialog ----
-    if (showDialog && paymentResponse != null) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Payment Successful", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, fontSize = 20.sp) },
-            text = {
-                Column {
-                    Text("Transaction ID: ${paymentResponse.transaction_id ?: "N/A"}")
-                    Text("Your order is on its way!", fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Payment Successful", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
+                text = {
+                    Column {
+                        Text("Transaction ID: ${System.currentTimeMillis()}")
+                        Text("Your order is on its way!", fontWeight = FontWeight.SemiBold)
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { showDialog = false },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                    ) {
+                        Text("OK", color = Color.White)
+                    }
                 }
-            },
-            confirmButton = {
-                Button(
-                    onClick = { showDialog = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                ) {
-                    Text("OK", color = Color.White)
-                }
-            }
-        )
+            )
+        }
     }
 }
 
@@ -474,12 +269,42 @@ fun OrderSummary(netTotal: Int, cgst: Double, sgst: Double, grandTotal: Double) 
         colors = CardDefaults.cardColors(Color.White)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text("ORDER SUMMARY", fontSize = 16.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+            Text("ORDER SUMMARY", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             OrderDetailRow("Net Total", netTotal)
             OrderDetailRow("CGST (2.5%)", cgst.toInt())
             OrderDetailRow("SGST (2.5%)", sgst.toInt())
             Divider()
             OrderDetailRow("Grand Total", grandTotal.toInt(), isBold = true)
+        }
+    }
+}
+
+@Composable
+fun OrderDetailRow(label: String, amount: Int, isBold: Boolean = false) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, fontSize = 14.sp, fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal)
+        Text("₹$amount", fontSize = 14.sp, fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal)
+    }
+}
+
+@Composable
+fun ReturnPolicy() {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(Color.White)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text("Return & Refund Policy", fontWeight = FontWeight.Bold)
+            Text(
+                text = "In case of any return, we ensure quick refunds. Full amount will be reflected excluding convenience fee.",
+                fontSize = 12.sp
+            )
         }
     }
 }

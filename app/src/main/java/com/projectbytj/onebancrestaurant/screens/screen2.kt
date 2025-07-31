@@ -133,12 +133,6 @@ fun ItemDetailScreen(itemId: String, navController: NavController, viewModel: Pa
                                 quantity = mutableStateOf(1)
                             )
                         )
-
-
-
-
-
-
                     }
                 },
                 modifier = Modifier
