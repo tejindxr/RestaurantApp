@@ -67,7 +67,9 @@ data class GetItemByIdResponse(
 
 // for filter
 data class GetItemByFilterRequest(
-    val cuisine_type: List<String>
+    val cuisine_type: List<String>? = null,
+    val price_range: Int? = null,   // <-- Added price range filter (like 50, 100, 200)
+    val min_rating: Double? = null
 )
 data class GetItemByFilterResponse(
     val response_code: Int,
@@ -138,22 +140,40 @@ class PageLink : ViewModel() {
 
 
     // for filter to display the dishes
+
     private val _dishes = mutableStateOf<List<Dish>>(emptyList())
     val dishes: State<List<Dish>> get() = _dishes
 
-    fun fetchDishesByCuisine(cuisineName: String, fallbackItems: List<Dish> = emptyList()) {
+    private val _filteredDishes = mutableStateOf<List<Dish>>(emptyList())
+    val filteredDishes: State<List<Dish>> get() = _filteredDishes
+
+    fun applyPriceFilter(maxPrice: Int, originalList: List<Dish>) {
+        _filteredDishes.value = originalList.filter {
+            it.price.toIntOrNull() ?: 0 <= maxPrice
+        }
+    }
+    fun clearFilter() {
+        _filteredDishes.value = emptyList()
+    }
+    fun fetchFilteredDishes(cuisineName: String, maxPrice: Int) {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.getItemsByFilter(
-                    GetItemByFilterRequest(listOf(cuisineName))
+                    GetItemByFilterRequest(listOf(cuisineName)) // API call (already valid)
                 )
-                _dishes.value = if (response.items.isNotEmpty()) response.items else fallbackItems
+
+                // ✅ Safely convert price
+                _filteredDishes.value = response.items.filter { dish ->
+                    val price = dish.price.toIntOrNull() ?: Int.MAX_VALUE
+                    price <= maxPrice
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-                _dishes.value = fallbackItems
+                _filteredDishes.value = emptyList()
             }
         }
     }
+
 
 
     // payment viewmodel
