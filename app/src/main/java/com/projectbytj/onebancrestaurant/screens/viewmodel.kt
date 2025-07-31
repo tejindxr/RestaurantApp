@@ -80,7 +80,7 @@ data class GetItemByFilterResponse(
 
 // Payment data class
 data class PaymentRequest(
-    val item_id: Int,
+    val item_id: String,
     val quantity: Int,
     val amount: Int
 )
@@ -180,7 +180,7 @@ class PageLink : ViewModel() {
     private val _paymentResponse = mutableStateOf<PaymentResponse?>(null)
     val paymentResponse: State<PaymentResponse?> get() = _paymentResponse
 
-    fun makePayment(itemId: Int, quantity: Int, amount: Int) {
+    fun makePayment(itemId: String, quantity: Int, amount: Int) {
         viewModelScope.launch {
             try {
                 // ✅ Log before API call

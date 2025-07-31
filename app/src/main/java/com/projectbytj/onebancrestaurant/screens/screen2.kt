@@ -125,8 +125,9 @@ fun ItemDetailScreen(itemId: String, navController: NavController, viewModel: Pa
                         // Add the item to Cart list here
                         Cart.add(
                             CartItem(
-                                id = dish.item_id,          // keep as Int
+                                id = dish.item_id.toString(),          // keep as Int
                                 name = dish.item_name,
+                                cuisineName = dish.cuisine_name,
                                 imageUrl = dish.item_image_url,
                                 price = dish.item_price,
                                 quantity = mutableStateOf(1)
